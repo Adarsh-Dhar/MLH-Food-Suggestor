@@ -2,7 +2,6 @@
 "use client"
 import axios from 'axios';
 import React, { useState } from 'react';
-import IngredientInput from './components/IngredientInput/page'; // Adjust the path as needed
 
 interface Food {
     idMeal: string;
@@ -14,17 +13,17 @@ interface Food {
 }
 
 export default function Home() {
-    const [ingredients, setIngredients] = useState<string[]>([]);
+    const [ingredientInput, setIngredientInput] = useState<string>('');
     const [suggestedFoods, setSuggestedFoods] = useState<Food[]>([]);
 
-    const handleAddIngredient = (ingredient: string): void => {
-        setIngredients([...ingredients, ingredient]);
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        setIngredientInput(event.target.value);
     };
 
-    const handleSubmit = async (): Promise<void> => {
+    const handleAddIngredient = async (): Promise<void> => {
         try {
             const response = await axios.get(
-                `https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredients.join(',')}`
+                `https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredientInput}`
             );
             if (response.data.meals) {
                 setSuggestedFoods(response.data.meals);
@@ -39,13 +38,21 @@ export default function Home() {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Food Suggestor</h1>
-            <IngredientInput onAddIngredient={handleAddIngredient} />
-            <button
-                className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-                onClick={handleSubmit}
-            >
-                Submit
-            </button>
+            <div className="flex flex-col items-center mb-4">
+                <input
+                    type="text"
+                    placeholder="Enter ingredient"
+                    value={ingredientInput}
+                    onChange={handleInputChange}
+                    className="border border-gray-300 rounded px-3 py-2 mb-2 w-full max-w-md"
+                />
+                <button
+                    onClick={handleAddIngredient}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full max-w-md"
+                >
+                    show
+                </button>
+            </div>
             {suggestedFoods.length > 0 && (
                 <div className="mt-4">
                     <h2 className="text-xl font-semibold mb-2">Suggested Foods</h2>
